@@ -3,6 +3,7 @@
 from collections import Counter, defaultdict
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
 import pandas as pd
 import seaborn as sns
 from sklearn import datasets
@@ -55,11 +56,9 @@ def getDecisionSpaceCrossSectionMap(classifier, fixDims, fixDimVals,freeDimsLimi
 
 def discrete_cmap(N, base_cmap=None):
 	""" Create an N-bin discrete colormap from the specified input map """
-
 	# Note that if base_cmap is a string or None, you can simply do
 	#    return plt.cm.get_cmap(base_cmap, N)
 	# The following works for string, None, or a colormap instance:
-
 	base = plt.cm.get_cmap(base_cmap)
 	color_list = base(np.linspace(0, 1, N))
 	cmap_name = base.name + str(N)
@@ -128,55 +127,61 @@ def plotScatter(feature, label):
 def plotDecisonBoundary(selectedFeatures, classifier, lambda0, lambda1):
 	x1 = selectedFeatures[:, 0]
 	x2 = selectedFeatures[:, 1]
+	custom_cmap = ListedColormap(["#000000","#DC143C", "#000080", "#228B22"])
 	# predfeature = feature[...,2:]
 	# print('predfeature' + str(predfeature))
 	# print('x1' + str(x1))
 	# print('x2' + str(x2))
 	x1_min, x1_max = x1.min(), x1.max()
 	x2_min, x2_max = x2.min(), x2.max()
-	step = 0.1
-	xx, yy = np.meshgrid(np.arange(-0.5,9,step),np.arange(-0.5,4.5,step))
+	h = 0.025
+	xx, yy = np.meshgrid(np.arange(0,8,h),np.arange(0,4,h))
+
 	z = np.c_[xx.ravel(), yy.ravel()]
-	print(z.shape)
 	clf = classifier
 	zz = clf.predict(z, lambda0, lambda1)
-	print(zz.shape)
-	zz = zz.reshape(xx.shape)
-	print(zz.shape)
+	zzz = zz.reshape(xx.shape)
 	# print('xx' + str(xx.shape))
 	# print('yy' + str(yy.shape))
 	# print('zz' + str(zz.shape))
-	plt.contour(xx, yy, zz)
+	# custom_cmap = ListedColormap(['#DC143C', '#000080', '#228B22','#D3D3D3', '#DCDCDC'])
+	plt.xlabel('petal length')
+	plt.ylabel('petal width')
+	ctl = plt.contour(xx, yy, zzz, [-2,-1,0,1,2], alpha=0.65, cmap=custom_cmap)
+	plt.clabel(ctl)
 	plt.show()
-	return zz
+	return zz,zzz
 
 
 if __name__ == '__main__':
-	trainModel = True
-	loadModel = False
+	trainModel = False
+	loadModel = True
 	compareModel = False
 	iris = datasets.load_iris()
 	features, labels = iris.data, iris.target
 	# irisDataFile = 'data/iris/iris.data'
 	# ffeatures, labels, labelEnc = loadData(irisDataFile)
 	selectedFeatures = features[..., 2:]
+	# print(selectedFeatures)
+	# print(labels)
 	# selectedFeatures = features[..., 2:]
 	eviclf = NNCDS()
+
 	if trainModel:
 		eviclf.fit(selectedFeatures, labels, max_iterations=10000)
-		with open('model/eviclf-2D-10000iter.pickle', 'wb') as fw:
+		with open('model/eviclf-2D-momentum0.9-epsilon0.01-10000iter.pickle', 'wb') as fw:
 			pickle.dump(eviclf, fw)
 
 	if loadModel:
-		with open('model/eviclf-2D-10000iter.pickle', 'rb') as fr:
+		with open('model/eviclf-2D-momentum0.9-epsilon0.01-10000iter.pickle', 'rb') as fr:
 			eviclfLoaded = pickle.load(fr)
 		# plotDecisionSpaceCrossSectionMap(eviclfLoaded, [0, 1], [5.5, 3.0], [(-1, 8), (-1, 4)], 0.05, rejectionCost=0.5, newLabelCost=0.65)
 		# cb = plt.colorbar(ticks=[-2,-1,0,1,2])
 		# cb.set_ticklabels(['Novel', 'Reject', 'Iris Setosa', 'Iris Veriscolor', 'Iris Virginica'])
 		# plt.show()
-		z = plotDecisonBoundary(selectedFeatures, eviclfLoaded, 0.5, 0.65)
-		plotScatter(selectedFeatures, labels)
-		plotDecisonBoundary(selectedFeatures, eviclfLoaded, 0.5, 0.65)
+		print('test'+str(eviclfLoaded.predict([[1.4,0.1]],0, 0)))
+		plotScatter(features, labels)
+		zz, zzz = plotDecisonBoundary(selectedFeatures, eviclfLoaded, 0, 0)
 
 	if compareModel:
 		knncla = KNeighborsClassifier(n_neighbors=3)
