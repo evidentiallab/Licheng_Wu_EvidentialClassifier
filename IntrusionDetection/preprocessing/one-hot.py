@@ -88,22 +88,19 @@ def one_hot(df):
     is_guest_login_one_hot = pd.get_dummies(df["is_guest_login"], prefix="is_guest_login")
     df = df.drop("is_guest_login", axis=1)
     df = df.join(is_guest_login_one_hot)
+
+    label_one_hot = pd.get_dummies(df["label"], prefix="label")
+    df = df.drop("label", axis=1)
+    df = df.join(label_one_hot)
     return df
 
 
 if __name__ == '__main__':
     df = pd.read_csv('../dataset/KDDCUP99/processed/kddcup.data_10_percent_corrected.csv')
-    # print(df)
-    # df = one_hot(df,"protocol_type")
-    # df = one_hot(df, "service")
-    # df = one_hot(df, "flag")
-    # df = one_hot(df, "land")
-    # df = one_hot(df, "logged_in")
-    # df = one_hot(df, "is_host_login")
-    # df = one_hot(df, "is_guest_login")
-    df = one_hot(df)
     print(df)
-    dataset = df.to_csv('../dataset/KDDCUP99/processed/kddcup_10_percent_onehot.csv',header=True,index=0)
-    ds = pd.read_csv('../dataset/KDDCUP99/processed/kddcup_10_percent_onehot_ordered.csv')
+    df = one_hot(df)
+    # print(df)
+    dataset = df.to_csv('../dataset/KDDCUP99/processed/one-hot2.csv',header=True,index=0)
+    ds = pd.read_csv('../dataset/KDDCUP99/processed/one-hot2.csv')
     print(ds)
 

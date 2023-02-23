@@ -10,8 +10,8 @@ global label_list  # label_list为全局变量
 
 # 定义kdd99数据预处理函数
 def preHandel_data():
-    source_file = '../dataset/KDDCUP99/OriginalKDD/kddcup.data_10_percent_corrected'
-    handled_file = '../dataset/KDDCUP99/processed/kddcup.data_10_percent_corrected.csv'
+    source_file = '../dataset/KDDCUP99/processed/kddcup_10_percent_onehot_ordered.csv'
+    handled_file = '../dataset/KDDCUP99/processed/kddcup_10_percent_onehot_ordered_numerial_labe.csv'
     data_file = open(handled_file, 'w', newline='')  # python3.x中添加newline=''这一参数使写入的文件没有多余的空行
     with open(source_file, 'r') as data_source:
         csv_reader = csv.reader(data_source)
@@ -87,4 +87,4 @@ if __name__ == '__main__':
     label_list = []
     preHandel_data()
     end_time = time.clock()
-    print("Running time:", (end_time - start_time))  # 输出程序运行时间
+    # print("Running time:", (end_time - start_time))  # 输出程序运行时间
