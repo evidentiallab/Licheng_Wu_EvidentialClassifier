@@ -18,7 +18,7 @@ def basicPCA(n, data):
     pca = PCA(n_components=n)
     newX = pca.fit_transform(data)
     invX = pca.inverse_transform(newX)
-    pd.DataFrame(invX).to_csv('../dataset/KDDCUP99/inverseTrans/121_124(dummy).csv')
+    # pd.DataFrame(invX).to_csv('../dataset/KDDCUP99/inverseTrans/121_124(dummy).csv')
     # print(type(pca.explained_variance_ratio_))
     s = pca.explained_variance_ratio_
     print('cumulativeVarRate = ' + str(s.sum()))
@@ -46,7 +46,7 @@ def plotCumulativeVarRatio(n, data):
 
 if __name__ == '__main__':
     n_feature = 124
-    pc = 121
+    pc = 124
 
     if n_feature == 121:
         df = pd.read_csv('../dataset/KDDCUP99/Z-score_121(dummy).csv', header=None)
@@ -57,7 +57,7 @@ if __name__ == '__main__':
         # print(dataNd)
         # print(type(dataNd))
         # print(dataNd.shape)
-        basicPCA(pc, dataNd)
+        # basicPCA(pc, dataNd)
         # plotCumulativeVarRatio(n_feature, dataNd)
 
 
@@ -69,4 +69,4 @@ if __name__ == '__main__':
         # print(data)
         # print(np.isnan(data).any().to_string())
         basicPCA(pc, dataNd)
-        # plotCumulativeVarRatio(n_feature, dataNd)
+        plotCumulativeVarRatio(n_feature, dataNd)
